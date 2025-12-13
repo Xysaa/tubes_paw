@@ -1,4 +1,5 @@
 from pyramid.config import Configurator
+from .models.user import Base
 
 
 def main(global_config, **settings):
