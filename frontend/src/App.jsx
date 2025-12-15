@@ -1,11 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-// ✅ Layout Components (Navbar + Footer selalu muncul)
+//  Layout Components (Navbar + Footer selalu muncul)
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
-// ✅ Pages (Halaman utama yang punya route sendiri)
+//  Pages (Halaman utama yang punya route sendiri)
 import Home from './pages/Home/Home';         
 import Login from './pages/Login/Login';      
 import Register from './pages/Register/Register'; 

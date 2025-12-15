@@ -11,9 +11,9 @@ const Home = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // ✅ SIMULASI LOADING (1 detik)
+    //  SIMULASI LOADING (1 detik)
     setTimeout(() => {
-      // ✅ DATA DUMMY (Ganti nanti dengan API backend)
+      //  DATA DUMMY (Ganti nanti dengan API backend)
       const dummyClasses = [
         {
           id: 1,

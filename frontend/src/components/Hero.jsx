@@ -1,9 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Hero = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="relative bg-gym-dark overflow-hidden border-b border-gray-800">
-      {/* Background Gradient */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-gym-green/10 to-transparent"></div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 relative z-10">
@@ -18,10 +20,19 @@ const Hero = () => {
             Bergabunglah dengan komunitas kebugaran terbaik. Fasilitas lengkap, pelatih ahli, dan lingkungan yang mendukung transformasi Anda.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <button className="px-8 py-4 bg-gym-green text-black font-extrabold rounded hover:bg-white transition duration-300 shadow-[0_0_20px_rgba(57,255,20,0.4)]">
+            {/*  TOMBOL DAFTAR - Navigasi ke /register */}
+            <button 
+              onClick={() => navigate('/register')}
+              className="px-8 py-4 bg-gym-green text-black font-extrabold rounded hover:bg-white transition duration-300 shadow-[0_0_20px_rgba(57,255,20,0.4)]"
+            >
               DAFTAR SEKARANG
             </button>
-            <button className="px-8 py-4 border border-gray-600 text-white font-bold rounded hover:border-white hover:bg-white hover:text-black transition duration-300">
+            
+            {/*  TOMBOL LIHAT JADWAL - Scroll ke #classes */}
+            <button 
+              onClick={() => document.getElementById('classes')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-8 py-4 border border-gray-600 text-white font-bold rounded hover:border-white hover:bg-white hover:text-black transition duration-300"
+            >
               LIHAT JADWAL
             </button>
           </div>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
-// ✅ Import UI Components (Reusable)
+//  Import UI Components (Reusable)
 import Input from '../../components/UI/Input';
 import Button from '../../components/UI/Button';
 
@@ -65,7 +65,7 @@ const Register = () => {
           <h2 className="text-3xl font-black text-white italic tracking-tighter">
             DAFTAR <span className="text-gym-green">MEMBER</span>
           </h2>
-          <p className="text-gray-500 text-sm mt-2">Join the IronGym family!</p>
+          <p className="text-gray-500 text-sm mt-2">Join the HexaFit family!</p>
         </div>
 
         {/* Error Alert */}
