@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Gunakan ini untuk navigasi antar halaman
-import Input from '../components/ui/Input';     // Import komponen yang kita buat tadi
-import Button from '../components/ui/Button';
+import Input from '../components/UI/Input';     // Import komponen yang kita buat tadi
+import Button from '../components/UI/Button';
 
 const Login = () => {
   // State Logic
