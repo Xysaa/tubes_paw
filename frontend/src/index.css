@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+@theme {
+  --color-gym-black: #0f0f0f;
+  --color-gym-dark: #1a1a1a;
+  --color-gym-green: #39ff14;
+}
+
+/* Pastikan body selalu hitam agar tidak ada flash putih saat reload */
+body {
+  background-color: #0f0f0f; 
+  color: white;
+  margin: 0;
+  min-height: 100vh;
+}
