@@ -531,18 +531,38 @@
   transform: translateX(0.25rem);
 }
 
-/* 
-   6. ABOUT SECTION
-    */
+/* ============================================
+   6. ABOUT SECTION - WITH BACKGROUND IMAGE
+   ============================================ */
 .about-section {
   background: linear-gradient(to bottom, #0f0f0f, #18181b);
   border-top: 1px solid #27272a;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background Image Overlay */
+.about-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('./images/gym 2.jpg'); /* PATH GAMBAR ANDA */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.15; /* Transparansi agar teks tetap terbaca */
+  z-index: 0;
 }
 
 .about-container {
   max-width: 80rem;
   margin: 0 auto;
   padding: 5rem 1rem;
+  position: relative;
+  z-index: 1; /* Di atas background image */
 }
 
 .about-header {
@@ -624,7 +644,6 @@
   height: 8rem;
   color: #39ff14;
 }
-
 /* 
    7. CONTACT SECTION
     */

@@ -17,13 +17,11 @@ const Navbar = () => {
   // Helper function untuk smooth scroll ke section
   const scrollToSection = (sectionId) => {
     if (location.pathname !== '/') {
-      // Jika tidak di home page, navigate dulu ke home
       navigate('/');
       setTimeout(() => {
         document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     } else {
-      // Jika sudah di home page, langsung scroll
       document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
     }
   };
@@ -33,18 +31,47 @@ const Navbar = () => {
       <div className="navbar-container">
         <div className="navbar-content">
           
-          {/* Logo - Scroll to top */}
+          {/* Logo dengan Icon */}
           <button 
             onClick={() => scrollToSection('home')}
             className="navbar-logo"
           >
+            {/* OPSI 1: SVG Icon Dumbbell Inline */}
+            {/* <svg 
+              className="w-8 h-8 mr-2" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+              style={{ color: '#39ff14' }}
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth="2" 
+                d="M3 5h2M3 19h2m14-14h2m-2 14h2M7 5a2 2 0 012-2h6a2 2 0 012 2v14a2 2 0 01-2 2H9a2 2 0 01-2-2V5z"
+              />
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth="2" 
+                d="M9 10h6M9 14h6"
+              />
+            </svg> */}
+
+            {/* OPSI 2: Jika pakai gambar PNG/SVG dari file */}
+            {<img 
+              src="/images/1.png" 
+              alt="HexaFit Logo" 
+              className="w-8 h-8 mr-2"
+            />}
+
             Hexa<span className="navbar-logo-accent">Fit</span>
           </button>
 
           {/* Menu Desktop */}
           <div className="navbar-menu">
             <div className="navbar-menu-list">
-              {/* Home - Scroll to top */}
+              {/* Home */}
               <button 
                 onClick={() => scrollToSection('home')}
                 className="navbar-link"
@@ -52,7 +79,7 @@ const Navbar = () => {
                 Home
               </button>
               
-              {/* Show Dashboard link jika sudah login */}
+              {/* Dashboard - Show if logged in */}
               {isAuthenticated && (
                 <Link 
                   to={user?.role === 'trainer' ? '/trainer/dashboard' : '/member/dashboard'} 
@@ -62,7 +89,7 @@ const Navbar = () => {
                 </Link>
               )}
 
-              {/* About - Scroll to section */}
+              {/* About */}
               <button 
                 onClick={() => scrollToSection('about')}
                 className="navbar-link"
@@ -70,7 +97,7 @@ const Navbar = () => {
                 About
               </button>
               
-              {/* Classes - Scroll to section */}
+              {/* Classes */}
               <button 
                 onClick={() => scrollToSection('classes')}
                 className="navbar-link"
@@ -78,7 +105,7 @@ const Navbar = () => {
                 Classes
               </button>
 
-              {/* Contact - Scroll to section */}
+              {/* Contact */}
               <button 
                 onClick={() => scrollToSection('contact')}
                 className="navbar-link"
@@ -86,7 +113,7 @@ const Navbar = () => {
                 Contact
               </button>
               
-              {/* Show Login atau User Menu */}
+              {/* Login / User Menu */}
               {!isAuthenticated ? (
                 <button 
                   onClick={() => navigate('/login')}
