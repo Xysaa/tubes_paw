@@ -3,6 +3,7 @@ import Hero from '../../components/Hero';
 import ClassCard from '../../components/ClassCard'; 
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ErrorMessage from '../../components/ErrorMessage';
+import TrainerCard from '../../components/TrainerCard';
 
 const Home = () => {
   const [classes, setClasses] = useState([]);
@@ -124,6 +125,39 @@ const Home = () => {
               </div>
             </div>
           </div>
+
+            {/* SECTION: OUR TRAINERS */}
+            <div id="trainers" className="trainers-section">
+              <div className="trainers-container">
+                <div className="classes-header">
+                  <div>
+                    <p className="trainers-badge">OUR TRAINERS</p>
+                    <h2 className="classes-title">Meet Our <span className="classes-title-accent">Trainers</span></h2>
+                    <p className="classes-subtitle">Pilih trainer terbaik dan kenali tim kami.</p>
+                  </div>
+                </div>
+
+                <div className="classes-grid">
+                  {
+                    // sample trainer data; swap images as needed
+                    [
+                      { id: 1, name: 'Alex Carter', role: 'Strength & Conditioning Coach', image: '/images/1.png' },
+                      { id: 2, name: 'Emily Turner', role: 'Yoga & Recovery Specialist', image: '/images/2.png' },
+                      { id: 3, name: 'Ethan Parker', role: 'Cardio & Endurance Coach', image: '/images/gym.jpg' },
+                      { id: 4, name: 'Oliver Reed', role: 'Performance Trainer', image: '/images/gym 2.jpg' },
+                      { id: 5, name: 'Ryan Brooks', role: 'Muscle Building Trainer', image: '/images/1.png' },
+                      { id: 6, name: 'Lucas Bennett', role: 'Mobility & Rehab Coach', image: '/images/2.png' }
+                    ].map(trainer => (
+                      <TrainerCard key={trainer.id} trainer={trainer} />
+                    ))
+                  }
+                </div>
+
+                <div className="trainers-footer text-center mt-6">
+                  <button className="trainers-cta">See More Trainers</button>
+                </div>
+              </div>
+            </div>
 
         </div>
       </div>
