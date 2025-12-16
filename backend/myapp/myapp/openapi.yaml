@@ -1,0 +1,395 @@
+openapi: 3.0.3
+info:
+  title: Gym Booking & Membership API
+  description: REST API for gym class booking, memberships, and attendance tracking
+  version: 1.0.0
+
+servers:
+  - url: http://127.0.0.1:6543
+
+tags:
+  - name: Auth
+  - name: Classes
+  - name: Booking
+  - name: Membership Plans
+  - name: Membership
+  - name: Attendance
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [admin, trainer, member]
+
+    Class:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        schedule:
+          type: string
+        capacity:
+          type: integer
+        trainer_id:
+          type: integer
+
+    MembershipPlan:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: integer
+        duration_days:
+          type: integer
+
+    Membership:
+      type: object
+      properties:
+        id:
+          type: integer
+        member_id:
+          type: integer
+        status:
+          type: string
+        start_at:
+          type: string
+          format: date-time
+        end_at:
+          type: string
+          format: date-time
+        plan:
+          $ref: "#/components/schemas/MembershipPlan"
+
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+        member_id:
+          type: integer
+        class_id:
+          type: integer
+        booking_date:
+          type: string
+          format: date-time
+
+paths:
+
+  # ================= AUTH =================
+
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register new member
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "201":
+          description: Member registered
+        "400":
+          description: Invalid input
+        "409":
+          description: Email already registered
+
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Login success
+        "401":
+          description: Invalid credentials
+
+  /api/auth/me:
+    get:
+      tags: [Auth]
+      summary: Get current user
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Current user info
+        "401":
+          description: Unauthorized
+
+  /api/admin/users:
+    get:
+      tags: [Auth]
+      summary: List all users (admin only)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Users list
+        "403":
+          description: Forbidden
+
+  # ================= CLASSES =================
+
+  /api/classes:
+    get:
+      tags: [Classes]
+      summary: List classes
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of classes
+
+    post:
+      tags: [Classes]
+      summary: Create class (admin / trainer)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required: [name, schedule, capacity]
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                schedule:
+                  type: string
+                capacity:
+                  type: integer
+                trainer_id:
+                  type: integer
+      responses:
+        "201":
+          description: Class created
+        "403":
+          description: Forbidden
+
+  /api/classes/{id}:
+    get:
+      tags: [Classes]
+      summary: Class detail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Class detail
+        "404":
+          description: Class not found
+
+    put:
+      tags: [Classes]
+      summary: Update class
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Class updated
+        "403":
+          description: Forbidden
+
+    delete:
+      tags: [Classes]
+      summary: Delete class
+      security:
+        - BearerAuth: []
+      responses:
+        "204":
+          description: Deleted
+        "403":
+          description: Forbidden
+
+  # ================= BOOKING =================
+
+  /api/classes/{id}/book:
+    post:
+      tags: [Booking]
+      summary: Book class (member only)
+      security:
+        - BearerAuth: []
+      responses:
+        "201":
+          description: Booking created
+        "403":
+          description: Membership required
+        "409":
+          description: Class full or already booked
+
+  /api/bookings:
+    get:
+      tags: [Booking]
+      summary: List my bookings
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Booking list
+
+  /api/classes/{id}/participants:
+    get:
+      tags: [Booking]
+      summary: Class participants (trainer/admin)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Participants list
+        "403":
+          description: Forbidden
+
+  # ================= MEMBERSHIP PLAN =================
+
+  /api/memberships:
+    get:
+      tags: [Membership Plans]
+      summary: List membership plans
+      responses:
+        "200":
+          description: Plans list
+
+    post:
+      tags: [Membership Plans]
+      summary: Create membership plan (admin)
+      security:
+        - BearerAuth: []
+      responses:
+        "201":
+          description: Plan created
+        "403":
+          description: Forbidden
+
+  /api/memberships/{id}:
+    put:
+      tags: [Membership Plans]
+      summary: Update membership plan
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Updated
+
+    delete:
+      tags: [Membership Plans]
+      summary: Delete membership plan
+      security:
+        - BearerAuth: []
+      responses:
+        "204":
+          description: Deleted
+
+  # ================= MEMBER MEMBERSHIP =================
+
+  /api/memberships/{id}/subscribe:
+    post:
+      tags: [Membership]
+      summary: Subscribe membership (member)
+      security:
+        - BearerAuth: []
+      responses:
+        "201":
+          description: Membership activated
+        "409":
+          description: Already active
+
+  /api/my/membership:
+    get:
+      tags: [Membership]
+      summary: Get my membership
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Membership info
+
+  # ================= ATTENDANCE =================
+
+  /api/classes/{id}/attendance:
+    post:
+      tags: [Attendance]
+      summary: Mark attendance (trainer)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Attendance marked
+
+  /api/classes/{id}/attendance/list:
+    get:
+      tags: [Attendance]
+      summary: Class attendance list (trainer/admin)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Attendance list
+
+  /api/my/attendance:
+    get:
+      tags: [Attendance]
+      summary: My attendance history (member)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Attendance history
