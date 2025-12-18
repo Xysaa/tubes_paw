@@ -20,8 +20,7 @@ import TrainerDashboard from './pages/Dashboard/TrainerDashboard';
 import MemberClasses from './pages/Classes/MemberClasses';
 import TrainerClasses from './pages/Classes/TrainerClasses';
 
-<<<<<<< Updated upstream
-=======
+import AdminMemberships from './pages/Memberships/TrainerMemberships';
 import MemberMemberships from './pages/Memberships/MemberMemberships';
 
 >>>>>>> Stashed changes
@@ -100,9 +99,18 @@ function App() {
                 } 
               />
 
-<<<<<<< Updated upstream
-=======
-              {/* Protected Routes - Member Memberships */}
+              {/* ADMIN / TRAINER - Manage Membership Plans */}
+              <Route 
+                path="/trainer/memberships" 
+                element={
+                  // Sesuaikan role disini (misal 'admin' atau 'trainer')
+                  <RoleProtectedRoute allowedRoles={['trainer']}>
+                    <AdminMemberships />
+                  </RoleProtectedRoute>
+                } 
+              />
+
+              {/* MEMBER - View & Subscribe */}
               <Route 
                 path="/member/memberships" 
                 element={
@@ -112,17 +120,7 @@ function App() {
                 } 
               />
 
-              {/* Redirect untuk /memberships umum */}
-              <Route 
-                path="/memberships" 
-                element={
-                  <ProtectedRoute>
-                    <MembershipsRedirect />
-                  </ProtectedRoute>
-                } 
-              />
 
->>>>>>> Stashed changes
               {/* Redirect URL yang tidak valid */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

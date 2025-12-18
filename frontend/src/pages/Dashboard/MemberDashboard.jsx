@@ -3,7 +3,10 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../../context/authContext';
 import { Link } from 'react-router-dom';
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 import { attendanceHistory } from './AttendanceData';
 >>>>>>> Stashed changes
 
@@ -11,7 +14,10 @@ const MemberDashboard = () => {
   const { user } = useAuth();
   
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   // Dummy data untuk member
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
   const [myBookings] = useState([
@@ -41,7 +47,10 @@ const MemberDashboard = () => {
   });
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
   const [history] = useState(attendanceHistory);
 
   // Framer Motion variants
@@ -80,6 +89,9 @@ const MemberDashboard = () => {
     },
   };
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   return (
     <motion.div
@@ -91,6 +103,7 @@ const MemberDashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Welcome Header */}
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
         <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 border border-zinc-700 rounded-xl p-8 mb-8">
           <h1 className="text-4xl font-black text-white mb-2">
@@ -215,6 +228,54 @@ const MemberDashboard = () => {
               <p className="text-sm text-gray-500">Valid until {membershipInfo.endDate}</p>
            </motion.div>
 
+=======
+        <motion.div
+          className="bg-gradient-to-r from-zinc-900 to-zinc-800 border border-zinc-700 rounded-xl p-8 mb-8"
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.h1 className="text-4xl font-black text-white mb-2">
+            Welcome Back, <motion.span
+              className="text-gym-green"
+              animate={{ textShadow: ['0 0 10px rgba(57, 255, 20, 0.3)', '0 0 20px rgba(57, 255, 20, 0.6)', '0 0 10px rgba(57, 255, 20, 0.3)'] }}
+              transition={{ repeat: Infinity, duration: 2.5 }}
+            >
+              {user?.name}!
+            </motion.span>
+          </motion.h1>
+          <motion.p className="text-gray-400" variants={itemVariants}>
+            Role: <span className="text-gym-green font-bold">Member</span>
+          </motion.p>
+        </motion.div>
+
+        {/* Stats Card */}
+        <motion.div
+          className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+           {/* Card Membership */}
+           <motion.div
+             className="bg-zinc-900 border border-zinc-800 rounded-xl p-6"
+             variants={cardVariants}
+             whileHover="hover"
+           >
+              <motion.p className="text-lg font-bold text-white mb-2" variants={itemVariants}>
+                Membership
+              </motion.p>
+              <motion.p
+                className="text-2xl font-bold text-gym-green mb-1"
+                animate={{ color: ['#39ff14', '#2ed612', '#39ff14'] }}
+                transition={{ repeat: Infinity, duration: 3 }}
+              >
+                {membershipInfo.plan}
+              </motion.p>
+              <p className="text-sm text-gray-500">Valid until {membershipInfo.endDate}</p>
+           </motion.div>
+
+>>>>>>> Stashed changes
            {/* Card Classes Left */}
            <motion.div
              className="bg-zinc-900 border border-zinc-800 rounded-xl p-6"
@@ -382,6 +443,9 @@ const MemberDashboard = () => {
           </motion.div>
 
         </motion.div>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
       </div>
     </motion.div>

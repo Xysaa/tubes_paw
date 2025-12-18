@@ -78,11 +78,20 @@ const Navbar = () => {
           
           {/* Logo dengan Icon */}
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
           <motion.button 
             onClick={() => scrollToSection('home')}
             className="navbar-logo"
             whileTap={{ scale: 0.97 }}
             whileHover={{ scale: 1.02 }}
+=======
+          <motion.button
+            onClick={() => scrollToSection('home')}
+            className="navbar-logo"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+>>>>>>> Stashed changes
 =======
           <motion.button
             onClick={() => scrollToSection('home')}
@@ -118,6 +127,7 @@ const Navbar = () => {
               >
                 Home
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
               </button>
               
 =======
@@ -150,13 +160,23 @@ const Navbar = () => {
                   Dashboard
                 </Link>
               )}
+=======
+              </motion.button>
+>>>>>>> Stashed changes
 
               {/* About */}
-              <button 
+              <motion.button
                 onClick={() => scrollToSection('about')}
                 className="navbar-link"
+                custom={1}
+                variants={menuItemVariants}
+                initial="hidden"
+                animate="visible"
+                whileHover={{ color: '#39ff14', scale: 1.05 }}
+                transition={{ duration: 0.2 }}
               >
                 About
+<<<<<<< Updated upstream
               </button>
               
               {/* Classes - Show if logged in */}
@@ -175,6 +195,57 @@ const Navbar = () => {
                     className="navbar-link"
                   >
                     Dashboard
+=======
+              </motion.button>
+
+              {/* Dashboard - Show if logged in */}
+              {isAuthenticated && (
+                <motion.div
+                  custom={2}
+                  variants={menuItemVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  <Link
+                    to={user?.role === 'trainer' ? '/trainer/dashboard' : '/member/dashboard'}
+                    className="navbar-link"
+                  >
+                    Dashboard
+                  </Link>
+                </motion.div>
+              )}
+
+              {/* Classes - Show if logged in */}
+              {isAuthenticated && (
+                <motion.div
+                  custom={3}
+                  variants={menuItemVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  <Link
+                    to={user?.role === 'trainer' ? '/trainer/classes' : '/member/classes'}
+                    className="navbar-link"
+                  >
+                    Classes
+                  </Link>
+                </motion.div>
+              )}
+
+              {/* Memberships - Show if logged in */}
+              {isAuthenticated && (
+                <motion.div
+                  custom={4}
+                  variants={menuItemVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  <Link
+                    to={user?.role === 'trainer' ? '/trainer/memberships' : '/member/memberships'}
+                    className="navbar-link"
+                  >
+                    Memberships
+>>>>>>> Stashed changes
                   </Link>
                 </motion.div>
               )}
@@ -285,8 +356,11 @@ const Navbar = () => {
                   {/* Dropdown Menu */}
                   {showUserMenu && (
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                     <motion.div className="navbar-user-dropdown" initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.12 }}>
 =======
+=======
+>>>>>>> Stashed changes
                     <motion.div
                       className="navbar-user-dropdown"
                       variants={dropdownVariants}
@@ -294,6 +368,9 @@ const Navbar = () => {
                       animate="visible"
                       exit="exit"
                     >
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
                       <div className="navbar-dropdown-header">
                         <p className="navbar-dropdown-label">Role</p>
@@ -337,12 +414,15 @@ const Navbar = () => {
                         transition={{ duration: 0.2 }}
                       >
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                         <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                         </svg>
                         Logout
                       </button>
 =======
+=======
+>>>>>>> Stashed changes
                         <button
                           onClick={handleLogout}
                           className="navbar-dropdown-logout"
@@ -363,6 +443,9 @@ const Navbar = () => {
                           Logout
                         </button>
                       </motion.div>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
                     </motion.div>
                   )}

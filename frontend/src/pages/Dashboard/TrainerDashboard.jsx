@@ -10,6 +10,9 @@ const TrainerDashboard = () => {
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState(null);
   const [participants, setParticipants] = useState(classParticipants);
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   
   const [myClasses] = useState([
@@ -46,7 +49,10 @@ const TrainerDashboard = () => {
   });
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
   const handleOpenAttendance = (sessionId) => {
     setCurrentSessionId(sessionId);
     setIsAttendanceModalOpen(true);
@@ -66,6 +72,67 @@ const TrainerDashboard = () => {
     alert("Data absensi berhasil disimpan!");
     setIsAttendanceModalOpen(false);
   };
+<<<<<<< Updated upstream
+=======
+
+  // Framer Motion variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5 },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.9, y: 20 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      transition: { duration: 0.5 },
+    },
+    hover: {
+      y: -5,
+      boxShadow: '0 15px 30px rgba(57, 255, 20, 0.15)',
+      transition: { duration: 0.3 },
+    },
+  };
+
+  const modalVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.3 } },
+    exit: { opacity: 0, transition: { duration: 0.2 } },
+  };
+
+  const modalContentVariants = {
+    hidden: { opacity: 0, scale: 0.9, y: 20 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      transition: { duration: 0.4, type: 'spring', stiffness: 300, damping: 30 },
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.9,
+      y: 20,
+      transition: { duration: 0.2 },
+    },
+  };
+>>>>>>> Stashed changes
 
   // Framer Motion variants
   const containerVariants = {
@@ -235,12 +302,15 @@ const TrainerDashboard = () => {
 
         {/* Today's Schedule */}
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-8">
           <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
             <svg className="w-6 h-6 mr-2 text-gym-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
 =======
+=======
+>>>>>>> Stashed changes
         <motion.div
           className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-8"
           variants={itemVariants}
@@ -258,6 +328,9 @@ const TrainerDashboard = () => {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </motion.svg>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
             Today's Schedule
           </motion.h2>
@@ -270,14 +343,20 @@ const TrainerDashboard = () => {
           >
             {todaySchedule.map((session) => (
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
               <div key={session.id} className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-5 flex justify-between items-center hover:border-gym-green transition">
 =======
+=======
+>>>>>>> Stashed changes
               <motion.div
                 key={session.id}
                 className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-5 flex flex-col md:flex-row justify-between items-center hover:border-gym-green transition gap-4"
                 variants={itemVariants}
                 whileHover={{ y: -3, borderColor: '#39ff14' }}
               >
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
                 <div>
                   <h3 className="text-xl font-bold text-white mb-1">{session.className}</h3>
@@ -303,11 +382,14 @@ const TrainerDashboard = () => {
                   </div>
                 </div>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                 <button className="px-6 py-2 bg-gym-green text-black rounded font-bold hover:bg-white transition">
                   VIEW DETAILS
                 </button>
               </div>
 =======
+=======
+>>>>>>> Stashed changes
                 <motion.button
                   onClick={() => handleOpenAttendance(session.id)}
                   className="px-6 py-2 bg-gym-green text-black rounded font-bold hover:bg-white transition shadow-[0_0_10px_rgba(57,255,20,0.3)]"
@@ -317,12 +399,16 @@ const TrainerDashboard = () => {
                   MARK ATTENDANCE
                 </motion.button>
               </motion.div>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
             ))}
           </motion.div>
         </motion.div>
 
         {/* My Classes List */}
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
           <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
@@ -383,6 +469,36 @@ const TrainerDashboard = () => {
                 <p className="text-gray-400 text-sm mb-3">{cls.schedule}</p>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-400">
+=======
+        <motion.div
+          className="bg-zinc-900 border border-zinc-800 rounded-xl p-6"
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.h2 className="text-2xl font-bold text-white mb-6" variants={itemVariants}>
+            My Classes
+          </motion.h2>
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {myClasses.map((cls) => (
+              <motion.div
+                key={cls.id}
+                className="bg-zinc-800/50 border border-zinc-700 rounded-lg p-5 hover:border-gym-green transition"
+                variants={cardVariants}
+                whileHover="hover"
+              >
+                <motion.h3 className="text-xl font-bold text-white mb-2" variants={itemVariants}>
+                  {cls.name}
+                </motion.h3>
+                <p className="text-gray-400 text-sm mb-3">{cls.schedule}</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-400">
+>>>>>>> Stashed changes
                     Participants: <motion.span
                       className="text-gym-green font-bold"
                       animate={{ scale: [1, 1.1, 1] }}
@@ -485,6 +601,9 @@ const TrainerDashboard = () => {
             </motion.div>
           )}
         </AnimatePresence>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
       </div>

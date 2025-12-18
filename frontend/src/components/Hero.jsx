@@ -45,6 +45,7 @@ const Hero = () => {
 
   return (
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     <motion.section
       className="hero-section"
       initial={{ opacity: 0, y: 8 }}
@@ -53,6 +54,8 @@ const Hero = () => {
     >
       <div className="hero-gradient"></div>
 =======
+=======
+>>>>>>> Stashed changes
     <motion.div
       className="hero-section relative"
       initial={{ opacity: 0 }}
@@ -72,6 +75,9 @@ const Hero = () => {
         animate={{ opacity: [0.3, 0.5, 0.3] }}
         transition={{ repeat: Infinity, duration: 4 }}
       />
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
       
       <motion.div
@@ -123,6 +129,7 @@ const Hero = () => {
             viewport={{ once: true, amount: 0.3 }}
           >
             Bergabunglah dengan komunitas kebugaran terbaik. Fasilitas lengkap, pelatih ahli, dan lingkungan yang mendukung transformasi Anda.
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
           </p>
           <div className="hero-buttons">
@@ -183,10 +190,48 @@ const Hero = () => {
             >
               LIHAT JADWAL
             </motion.button>
+=======
+          </motion.p>
+
+          <motion.div
+            className="hero-buttons"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.button
+              onClick={() => navigate('/register')}
+              className="hero-btn-primary"
+              variants={itemVariants}
+              whileHover={{
+                scale: 1.05,
+                boxShadow: '0 0 25px rgba(57, 255, 20, 0.7)',
+              }}
+              whileTap={{ scale: 0.95 }}
+            >
+              DAFTAR SEKARANG
+            </motion.button>
+
+            <motion.button
+              onClick={() => document.getElementById('classes')?.scrollIntoView({ behavior: 'smooth' })}
+              className="hero-btn-secondary"
+              variants={itemVariants}
+              whileHover={{
+                scale: 1.05,
+                borderColor: '#39ff14',
+              }}
+              whileTap={{ scale: 0.95 }}
+            >
+              LIHAT JADWAL
+            </motion.button>
+>>>>>>> Stashed changes
           </motion.div>
         </motion.div>
       </motion.div>
     </motion.div>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
   );
 };

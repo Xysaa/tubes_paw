@@ -4,11 +4,14 @@ import { motion } from 'framer-motion';
 const Footer = () => {
   return (
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     <motion.footer className="footer" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28 }}>
       <div className="footer-container">
         <p>&copy; 2025 HexaFit System.</p>
       </div>
 =======
+=======
+>>>>>>> Stashed changes
     <motion.footer
       className="footer"
       initial={{ opacity: 0, y: 20 }}
@@ -38,6 +41,9 @@ const Footer = () => {
           </motion.span>.
         </motion.p>
       </motion.div>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     </motion.footer>
   );
