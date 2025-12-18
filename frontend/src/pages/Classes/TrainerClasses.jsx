@@ -1,201 +1,279 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../context/authContext';
-import { initialClasses } from './ClassesData'; // Import data dummy tadi
+import { initialClasses } from './ClassesData';
+import { motion, AnimatePresence } from 'framer-motion';
+
+/* ================= FRAMER MOTION VARIANTS ================= */
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
+
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1 } },
+};
+
+const modalBackdrop = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+};
+
+const modalContent = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.25 } },
+};
+/* ========================================================== */
 
 const TrainerClasses = () => {
-  // --- STATE ---
   const [classes, setClasses] = useState(initialClasses);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentClass, setCurrentClass] = useState(null); // Jika null = Mode Tambah, Jika isi = Mode Edit
-  
+  const [currentClass, setCurrentClass] = useState(null);
+
   const [formData, setFormData] = useState({
-    name: '', schedule: '', instructor: '', capacity: '', description: ''
+    name: '',
+    description: '',
+    schedule: '',
+    instructor: '',
+    capacity: '',
   });
 
-  // --- HANDLERS ---
-  
-  // Buka Modal Tambah
+  /* ================= HANDLERS ================= */
   const handleAddNew = () => {
     setCurrentClass(null);
-    setFormData({ name: '', schedule: '', instructor: '', capacity: '', description: '' });
+    setFormData({
+      name: '',
+      description: '',
+      schedule: '',
+      instructor: '',
+      capacity: '',
+    });
     setIsModalOpen(true);
   };
 
-  // Buka Modal Edit
   const handleEdit = (cls) => {
     setCurrentClass(cls);
     setFormData(cls);
     setIsModalOpen(true);
   };
 
-  // Hapus Kelas
   const handleDelete = (id) => {
     if (window.confirm('Yakin ingin menghapus kelas ini?')) {
       setClasses(classes.filter((c) => c.id !== id));
     }
   };
 
-  // Simpan Data (Create / Update)
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (currentClass) {
-      // Logic Update
-      setClasses(classes.map((c) => 
-        c.id === currentClass.id ? { ...formData, id: currentClass.id } : c
-      ));
+      setClasses(
+        classes.map((c) =>
+          c.id === currentClass.id ? { ...formData, id: c.id } : c
+        )
+      );
     } else {
-      // Logic Create
-      const newId = classes.length + 1;
-      setClasses([...classes, { ...formData, id: newId }]);
+      setClasses([
+        ...classes,
+        { ...formData, id: classes.length + 1 },
+      ]);
     }
+
     setIsModalOpen(false);
   };
+  /* ============================================ */
 
   return (
-    <div className="min-h-screen bg-gym-black py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* HEADER SECTION (Style mirip Dashboard) */}
-        <div className="flex flex-col md:flex-row justify-between items-end gap-4 mb-8 border-b border-zinc-800 pb-6">
+    <motion.div
+      className="min-h-screen bg-gym-black py-8"
+      initial="hidden"
+      animate="visible"
+      variants={fadeUp}
+    >
+      <div className="max-w-7xl mx-auto px-4">
+
+        {/* HEADER */}
+        <div className="flex justify-between items-end mb-8 border-b border-zinc-800 pb-6">
           <div>
-            <h1 className="text-4xl font-black text-white mb-2 uppercase italic">
+            <h1 className="text-4xl font-black text-white uppercase italic">
               Management <span className="text-gym-green">Kelas</span>
             </h1>
-            <p className="text-gray-400">Kelola jadwal, kapasitas, dan detail kelas latihan.</p>
+            <p className="text-gray-400 mt-2">
+              Kelola jadwal dan detail kelas latihan
+            </p>
           </div>
-          
-          <button 
+
+          <motion.button
             onClick={handleAddNew}
-            className="bg-gym-green hover:bg-white text-black font-bold py-3 px-6 rounded transition-all shadow-[0_0_15px_rgba(57,255,20,0.3)] flex items-center gap-2"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="bg-gym-green text-black font-bold py-3 px-6 rounded shadow"
           >
-            {/* Icon Plus */}
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"/></svg>
             TAMBAH KELAS
-          </button>
+          </motion.button>
         </div>
 
-        {/* GRID CLASSES (Style mirip ClassCard Member) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* GRID */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          variants={stagger}
+          initial="hidden"
+          animate="visible"
+        >
           {classes.map((cls) => (
-            <div key={cls.id} className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 relative group hover:border-gym-green transition-all duration-300 flex flex-col h-full">
-              
-              {/* Jadwal */}
-              <div className="flex items-center gap-2 text-gym-green font-bold text-sm mb-4 uppercase tracking-wide">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <motion.div
+              key={cls.id}
+              variants={fadeUp}
+              whileHover={{ y: -6 }}
+              className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 flex flex-col"
+            >
+              <span className="text-gym-green text-sm font-bold mb-2">
                 {cls.schedule}
-              </div>
+              </span>
 
-              {/* Judul & Info */}
-              <h3 className="text-2xl font-black text-white mb-2 uppercase italic">{cls.name}</h3>
-              <p className="text-sm text-gray-400 mb-4">Instructor: <span className="text-white">{cls.instructor}</span></p>
-              
-              {/* Deskripsi */}
-              <p className="text-gray-500 text-sm mb-6 flex-grow line-clamp-3">
+              <h3 className="text-xl font-black text-white mb-2 uppercase italic">
+                {cls.name}
+              </h3>
+
+              <p className="text-gray-400 text-sm mb-2">
+                Instructor: <span className="text-white">{cls.instructor}</span>
+              </p>
+
+              <p className="text-gray-500 text-sm flex-grow mb-4">
                 {cls.description}
               </p>
 
-              {/* Action Buttons (CRUD) */}
-              <div className="grid grid-cols-2 gap-3 mt-auto pt-4 border-t border-zinc-800">
-                <button 
+              <div className="grid grid-cols-2 gap-3 pt-4 border-t border-zinc-800">
+                <button
                   onClick={() => handleEdit(cls)}
-                  className="py-2 rounded font-bold text-sm bg-zinc-800 text-white hover:bg-zinc-700 transition-colors border border-zinc-700"
+                  className="bg-zinc-800 text-white py-2 rounded font-bold"
                 >
                   EDIT
                 </button>
-                <button 
+                <button
                   onClick={() => handleDelete(cls.id)}
-                  className="py-2 rounded font-bold text-sm bg-transparent text-red-500 hover:bg-red-900/20 transition-colors border border-red-900/50"
+                  className="border border-red-800 text-red-500 py-2 rounded font-bold"
                 >
                   HAPUS
                 </button>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        {/* MODAL FORM (Popup) */}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-            <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-8 w-full max-w-lg shadow-2xl relative">
-              <h2 className="text-2xl font-bold mb-6 text-white border-l-4 border-gym-green pl-3">
-                {currentClass ? 'Edit Kelas' : 'Buat Kelas Baru'}
-              </h2>
-              
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="text-gray-400 text-sm block mb-1">Nama Kelas</label>
-                  <input 
-                    className="w-full bg-black border border-zinc-700 rounded p-3 text-white focus:border-gym-green focus:outline-none"
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    required
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
+        {/* MODAL */}
+        <AnimatePresence>
+          {isModalOpen && (
+            <motion.div
+              className="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50"
+              variants={modalBackdrop}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+            >
+              <motion.div
+                variants={modalContent}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                className="bg-zinc-900 border border-zinc-700 rounded-xl p-8 w-full max-w-lg"
+              >
+                <h2 className="text-2xl font-bold text-white mb-6 border-l-4 border-gym-green pl-3">
+                  {currentClass ? 'Edit Kelas' : 'Tambah Kelas'}
+                </h2>
+
+                {/* ===== FORM (STYLE EDIT PLAN) ===== */}
+                <form onSubmit={handleSubmit} className="space-y-5">
+
                   <div>
-                    <label className="text-gray-400 text-sm block mb-1">Jadwal</label>
-                    <input 
-                      className="w-full bg-black border border-zinc-700 rounded p-3 text-white focus:border-gym-green focus:outline-none"
-                      value={formData.schedule}
-                      onChange={(e) => setFormData({...formData, schedule: e.target.value})}
+                    <label className="text-gray-400 text-sm">Nama Kelas</label>
+                    <input
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      className="w-full bg-black border border-zinc-700 rounded px-4 py-3 text-white"
                       required
                     />
                   </div>
+
                   <div>
-                    <label className="text-gray-400 text-sm block mb-1">Kapasitas</label>
-                    <input 
-                      type="number"
-                      className="w-full bg-black border border-zinc-700 rounded p-3 text-white focus:border-gym-green focus:outline-none"
-                      value={formData.capacity}
-                      onChange={(e) => setFormData({...formData, capacity: e.target.value})}
+                    <label className="text-gray-400 text-sm">Deskripsi</label>
+                    <textarea
+                      rows="4"
+                      value={formData.description}
+                      onChange={(e) =>
+                        setFormData({ ...formData, description: e.target.value })
+                      }
+                      className="w-full bg-black border border-zinc-700 rounded px-4 py-3 text-white resize-none"
                       required
                     />
                   </div>
-                </div>
 
-                <div>
-                  <label className="text-gray-400 text-sm block mb-1">Instructor</label>
-                  <input 
-                    className="w-full bg-black border border-zinc-700 rounded p-3 text-white focus:border-gym-green focus:outline-none"
-                    value={formData.instructor}
-                    onChange={(e) => setFormData({...formData, instructor: e.target.value})}
-                  />
-                </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-gray-400 text-sm">Kapasitas</label>
+                      <input
+                        type="number"
+                        value={formData.capacity}
+                        onChange={(e) =>
+                          setFormData({ ...formData, capacity: e.target.value })
+                        }
+                        className="w-full bg-black border border-zinc-700 rounded px-4 py-3 text-white"
+                        required
+                      />
+                    </div>
 
-                <div>
-                  <label className="text-gray-400 text-sm block mb-1">Deskripsi</label>
-                  <textarea 
-                    className="w-full bg-black border border-zinc-700 rounded p-3 text-white focus:border-gym-green focus:outline-none h-24 resize-none"
-                    value={formData.description}
-                    onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  />
-                </div>
+                    <div>
+                      <label className="text-gray-400 text-sm">Jadwal</label>
+                      <input
+                        value={formData.schedule}
+                        onChange={(e) =>
+                          setFormData({ ...formData, schedule: e.target.value })
+                        }
+                        className="w-full bg-black border border-zinc-700 rounded px-4 py-3 text-white"
+                        required
+                      />
+                    </div>
+                  </div>
 
-                <div className="flex gap-3 mt-6 pt-4">
-                  <button 
-                    type="button" 
-                    onClick={() => setIsModalOpen(false)}
-                    className="flex-1 py-3 text-gray-400 font-bold hover:text-white transition-colors"
-                  >
-                    BATAL
-                  </button>
-                  <button 
-                    type="submit" 
-                    className="flex-1 py-3 bg-gym-green text-black font-bold rounded hover:bg-white transition-colors"
-                  >
-                    SIMPAN
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+                  <div>
+                    <label className="text-gray-400 text-sm">Instructor</label>
+                    <input
+                      value={formData.instructor}
+                      onChange={(e) =>
+                        setFormData({ ...formData, instructor: e.target.value })
+                      }
+                      className="w-full bg-black border border-zinc-700 rounded px-4 py-3 text-white"
+                      required
+                    />
+                  </div>
+
+                  <div className="flex justify-between pt-6">
+                    <button
+                      type="button"
+                      onClick={() => setIsModalOpen(false)}
+                      className="text-gray-400 font-bold hover:text-white"
+                    >
+                      BATAL
+                    </button>
+                    <button
+                      type="submit"
+                      className="bg-gym-green text-black font-bold px-8 py-3 rounded"
+                    >
+                      SIMPAN
+                    </button>
+                  </div>
+                </form>
+                {/* ================================= */}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       </div>
-    </div>
+    </motion.div>
   );
 };
 
 export default TrainerClasses;
+
