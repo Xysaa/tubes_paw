@@ -1,5 +1,5 @@
-from datetime import datetime
-from sqlalchemy import Column, Integer, String, Text, DateTime
+from datetime import datetime, timezone
+from sqlalchemy import Column, Integer, String, Text, DateTime, JSON
 from .meta import Base
 
 
@@ -9,6 +9,13 @@ class MembershipPlan(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(100), nullable=False, unique=True)
     description = Column(Text, nullable=True)
-    price = Column(Integer, nullable=False)          # harga (misal rupiah)
-    duration_days = Column(Integer, nullable=False)  # masa aktif dalam hari
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    price = Column(Integer, nullable=False)
+    duration_days = Column(Integer, nullable=False)
+
+    features = Column(JSON, nullable=True)  # ✅ INI YANG KURANG
+
+    created_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
