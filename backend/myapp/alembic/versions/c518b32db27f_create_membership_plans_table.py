@@ -27,6 +27,7 @@ def upgrade():
         sa.Column("price", sa.Integer(), nullable=False),
         sa.Column("duration_days", sa.Integer(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False),
+        sa.Column("features", sa.JSON(), nullable=True),
     )
     op.create_unique_constraint("uq_membership_plan_name", "membership_plans", ["name"])
 
