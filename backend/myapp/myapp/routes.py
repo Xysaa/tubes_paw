@@ -30,6 +30,10 @@ def includeme(config):
     config.add_route("trainer_class_attendance", "/api/classes/{id}/attendance/list")
     config.add_route("member_attendance_history", "/api/my/attendance")
 
+    config.add_route("trainers_list", "/api/trainers")
+    config.add_route("trainer_detail", "/api/trainers/{id}")
+
+
     config.add_route("openapi_spec", "/openapi.yaml")
     config.add_route("swagger_ui", "/docs")
 

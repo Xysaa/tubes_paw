@@ -11,7 +11,9 @@ from .classes import Class
 from .booking import Booking  # flake8: noqa
 from .membership_plan import MembershipPlan  # noqa
 from .membership import Membership  # noqa
-from .attendance import Attendance  # noqa
+from .attendance import Attendance 
+from .trainers_profile import TrainerProfile
+ # noqa
 
 # Run ``configure_mappers`` after defining all of the models to ensure
 # all relationships can be setup.
