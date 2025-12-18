@@ -3,8 +3,9 @@ from sqlalchemy import (
     Integer,
     String,
     DateTime,
-    Enum
+    Enum,
 )
+from sqlalchemy.orm import relationship
 from enum import Enum as PyEnum
 from datetime import datetime
 from .meta import Base
@@ -32,3 +33,9 @@ class User(Base):
     )
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    trainer_profile = relationship(
+        "TrainerProfile",
+        uselist=False,
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
