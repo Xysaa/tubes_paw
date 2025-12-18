@@ -1,158 +1,155 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/authContext';
-import { ProtectedRoute, RoleProtectedRoute } from './components/ProtectedRoute';
-import './App.css'; // Import CSS yang sudah direfactor
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/authContext";
+import { ProtectedRoute, RoleProtectedRoute } from "./components/ProtectedRoute";
+import "./App.css";
 
-//  Layout Components
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
-//  Public Pages
-import Home from './pages/Home/Home';         
-import Login from './pages/Login/Login';      
-import Register from './pages/Register/Register';
-// About & Contact sekarang di Home.jsx (one-page)
+// Public
+import Home from "./pages/Home/Home";
+import Login from "./pages/Login/Login";
+import Register from "./pages/Register/Register";
+import PricingPage from "./pages/pricing/Pages";
 
-//  Protected Pages (Role-based)
-import MemberDashboard from './pages/Dashboard/MemberDashboard';
-import TrainerDashboard from './pages/Dashboard/TrainerDashboard';
+// Dashboards
+import MemberDashboard from "./pages/Dashboard/MemberDashboard";
+import TrainerDashboard from "./pages/Dashboard/TrainerDashboard";
+import AdminDashboard from "./pages/Dashboard/AdminDashboard";
 
-import MemberClasses from './pages/Classes/MemberClasses';
-import TrainerClasses from './pages/Classes/TrainerClasses';
+// Classes
+import MemberClasses from "./pages/Classes/MemberClasses";
+import TrainerClasses from "./pages/Classes/TrainerClasses";
 
-import AdminMemberships from './pages/Memberships/TrainerMemberships';
-import MemberMemberships from './pages/Memberships/MemberMemberships';
+// Memberships
+import AdminMemberships from "./pages/Memberships/TrainerMemberships";
+import MemberMemberships from "./pages/Memberships/MemberMemberships";
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="app-container">
-          
-          <Navbar />
+        <Navbar />
 
-          <main className="main-content">
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              
-              {/* Protected Routes - Member Only */}
-              <Route 
-                path="/member/dashboard" 
-                element={
-                  <RoleProtectedRoute allowedRoles={['member']}>
-                    <MemberDashboard />
-                  </RoleProtectedRoute>
-                } 
-              />
+        <main className="main-content">
+          <Routes>
+            {/* PUBLIC */}
+            <Route path="/" element={<Home />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-              {/* Protected Routes - Trainer Only */}
-              <Route 
-                path="/trainer/dashboard" 
-                element={
-                  <RoleProtectedRoute allowedRoles={['trainer']}>
-                    <TrainerDashboard />
-                  </RoleProtectedRoute>
-                } 
-              />
-              
-              {/* Redirect untuk /dashboard umum (auto redirect sesuai role) */}
-              <Route 
-                path="/dashboard" 
-                element={
-                  <ProtectedRoute>
-                    <DashboardRedirect />
-                  </ProtectedRoute>
-                } 
-              />
+            {/* DASHBOARD REDIRECT */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardRedirect />
+                </ProtectedRoute>
+              }
+            />
+            {/* ADMIN */}
+            <Route
+              path="/admin/dashboard"
+              element={
+                <RoleProtectedRoute allowedRoles={["admin"]}>
+                  <AdminDashboard />
+                </RoleProtectedRoute>
+              }
+            />
+            {/* MEMBER */}
+            <Route
+              path="/member/dashboard"
+              element={
+                <RoleProtectedRoute allowedRoles={["member"]}>
+                  <MemberDashboard />
+                </RoleProtectedRoute>
+              }
+            />
 
-              {/* Rute Khusus Trainer: Manage Kelas (CRUD) */}
-              <Route 
-                path="/trainer/classes" 
-                element={
-                  <RoleProtectedRoute allowedRoles={['trainer']}>
-                    <TrainerClasses />
-                  </RoleProtectedRoute>
-                } 
-              />
+            <Route
+              path="/member/classes"
+              element={
+                <RoleProtectedRoute allowedRoles={["member"]}>
+                  <MemberClasses />
+                </RoleProtectedRoute>
+              }
+            />
 
-              {/* Rute Khusus Member: Lihat & Booking Kelas */}
-              <Route 
-                path="member/classes" 
-                element={
-                  <RoleProtectedRoute allowedRoles={['member']}>
-                    <MemberClasses />
-                  </RoleProtectedRoute>
-                } 
-              />
+            <Route
+              path="/member/memberships"
+              element={
+                <RoleProtectedRoute allowedRoles={["member"]}>
+                  <MemberMemberships />
+                </RoleProtectedRoute>
+              }
+            />
 
-              {/* Redirect untuk /dashboard umum (auto redirect sesuai role) */}
-              <Route 
-                path="/classes" 
-                element={
-                  <ProtectedRoute>
-                    <DashboardRedirect />
-                  </ProtectedRoute>
-                } 
-              />
+            {/* TRAINER */}
+            <Route
+              path="/trainer/dashboard"
+              element={
+                <RoleProtectedRoute allowedRoles={["trainer"]}>
+                  <TrainerDashboard />
+                </RoleProtectedRoute>
+              }
+            />
 
-              {/* ADMIN / TRAINER - Manage Membership Plans */}
-              <Route 
-                path="/trainer/memberships" 
-                element={
-                  // Sesuaikan role disini (misal 'admin' atau 'trainer')
-                  <RoleProtectedRoute allowedRoles={['trainer']}>
-                    <AdminMemberships />
-                  </RoleProtectedRoute>
-                } 
-              />
+            <Route
+              path="/trainer/classes"
+              element={
+                <RoleProtectedRoute allowedRoles={["trainer"]}>
+                  <TrainerClasses />
+                </RoleProtectedRoute>
+              }
+            />
 
-              {/* MEMBER - View & Subscribe */}
-              <Route 
-                path="/member/memberships" 
-                element={
-                  <RoleProtectedRoute allowedRoles={['member']}>
-                    <MemberMemberships />
-                  </RoleProtectedRoute>
-                } 
-              />
+            <Route
+              path="/trainer/memberships"
+              element={
+                <RoleProtectedRoute allowedRoles={["trainer"]}>
+                  <AdminMemberships />
+                </RoleProtectedRoute>
+              }
+            />
 
+            {/* FALLBACK */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
 
-              {/* Redirect URL yang tidak valid */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </main>
-
-          <Footer />
-          
-        </div>
+        <Footer />
       </Router>
     </AuthProvider>
   );
 }
 
-// Component untuk auto-redirect dashboard sesuai role
+/* ===== AUTO REDIRECT DASHBOARD ===== */
 const DashboardRedirect = () => {
-  const { user } = useAuth();
-  
-  if (user?.role === 'trainer') {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user.role === "trainer") {
     return <Navigate to="/trainer/dashboard" replace />;
   }
-  
-  return <Navigate to="/member/dashboard" replace />;
-};
 
-const ClassesRedirect = () => {
-  const { user } = useAuth();
-  
-  if (user?.role === 'trainer') {
-    return <Navigate to="/trainer/classes" replace />;
+  if (user.role === "admin") {
+    return <Navigate to="/admin/dashboard" replace />;
   }
-  
-  return <Navigate to="/member/classes" replace />;
+
+  return <Navigate to="/member/dashboard" replace />;
 };
 
 export default App;
