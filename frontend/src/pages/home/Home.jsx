@@ -1,464 +1,353 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import Hero from '../../components/Hero'; 
-import ClassCard from '../../components/ClassCard'; 
-import LoadingSpinner from '../../components/LoadingSpinner';
-import ErrorMessage from '../../components/ErrorMessage';
-import TrainerCard from '../../components/TrainerCard';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
-const Home = () => {
-  const [classes, setClasses] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+import Hero from "../../components/Hero";
+import ClassCard from "../../components/ClassCard";
+import TrainerCard from "../../components/TrainerCard";
+
+import { fetchClasses, fetchTrainers } from "../../api";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 18 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, scale: 0.95, y: 18 },
+  visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.5 } },
+};
+
+/* ===== Simple auto+drag slider (no extra libs) ===== */
+const AutoSlider = ({ images = [] }) => {
+  const [index, setIndex] = useState(0);
+  const timerRef = useRef(null);
+
+  const go = (next) => setIndex((prev) => (prev + next + images.length) % images.length);
 
   useEffect(() => {
-    setTimeout(() => {
-      const dummyClasses = [
-        {
-          id: 1,
-          name: "BODY COMBAT",
-          schedule: "Senin & Rabu 19:00",
-          instructor: "Coach John",
-          capacity: 20,
-          description: "Kelas high-intensity yang menggabungkan gerakan bela diri dan kardio untuk membakar kalori maksimal."
-        },
-        {
-          id: 2,
-          name: "YOGA FLOW",
-          schedule: "Selasa & Kamis 18:00",
-          instructor: "Coach Sarah",
-          capacity: 15,
-          description: "Sesi yoga yang fokus pada fleksibilitas, keseimbangan, dan relaksasi pikiran."
-        },
-        {
-          id: 3,
-          name: "STRENGTH TRAINING",
-          schedule: "Setiap Hari 17:00",
-          instructor: "Coach Mike",
-          capacity: 25,
-          description: "Latihan beban untuk membangun massa otot dan meningkatkan kekuatan tubuh secara keseluruhan."
-        },
-        {
-          id: 4,
-          name: "ZUMBA PARTY",
-          schedule: "Jumat 19:30",
-          instructor: "Coach Maria",
-          capacity: 30,
-          description: "Kelas dance fitness yang energik dengan musik latin dan gerakan yang menyenangkan."
-        },
-        {
-          id: 5,
-          name: "SPINNING CLASS",
-          schedule: "Sabtu & Minggu 07:00",
-          instructor: "Coach Alex",
-          capacity: 20,
-          description: "Cycling indoor dengan intensitas tinggi untuk meningkatkan stamina dan membakar lemak."
-        },
-        {
-          id: 6,
-          name: "PILATES CORE",
-          schedule: "Rabu & Jumat 06:00",
-          instructor: "Coach Emma",
-          capacity: 12,
-          description: "Latihan fokus pada core strength, postur tubuh, dan kontrol pernapasan."
-        }
-      ];
+    if (!images.length) return;
+    timerRef.current = setInterval(() => go(1), 2800);
+    return () => clearInterval(timerRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [images.length]);
 
-      setClasses(dummyClasses);
-      setIsLoading(false);
-    }, 1000);
+  return (
+    <div className="w-full overflow-hidden">
+      <motion.div
+        className="flex gap-6 cursor-grab active:cursor-grabbing"
+        animate={{ x: `calc(${-index} * (320px + 24px))` }}
+        transition={{ type: "spring", stiffness: 140, damping: 20 }}
+        drag="x"
+        dragConstraints={{ left: -((images.length - 1) * (320 + 24)), right: 0 }}
+        onDragStart={() => clearInterval(timerRef.current)}
+        onDragEnd={(e, info) => {
+          if (info.offset.x < -80) go(1);
+          if (info.offset.x > 80) go(-1);
+          timerRef.current = setInterval(() => go(1), 2800);
+        }}
+      >
+        {images.map((src, i) => (
+          <div
+            key={i}
+            className="
+              min-w-[320px] h-[140px]
+              md:min-w-[360px] md:h-[160px]
+              rounded-2xl overflow-hidden
+              bg-black/30 shadow-lg
+            "
+          >
+            <img src={src} alt={`slide-${i}`} className="w-full h-full object-cover" />
+          </div>
+        ))}
+      </motion.div>
+    </div>
+  );
+};
+
+// helper: normalize response -> array
+const normalizeToArray = (res) => {
+  // axios response -> res.data
+  const payload = res?.data ?? res;
+
+  // payload bisa:
+  // 1) array langsung
+  // 2) { message, data: [...] }
+  // 3) { data: [...] }
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  return [];
+};
+
+const Home = () => {
+  const navigate = useNavigate();
+
+  const [classes, setClasses] = useState([]);
+  const [trainers, setTrainers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState("");
+
+  // slider masih statis (boleh nanti dari API juga)
+  const sliderImages = useMemo(
+    () => ["/images/gym.jpg", "/images/pelatih1.png", "/images/classes/transformation.jpg", "/images/classes/hiit.jpg","images/classes/functional.jpg"],
+    []
+  );
+
+  useEffect(() => {
+    let mounted = true;
+
+    const run = async () => {
+      try {
+        setLoading(true);
+        setErr("");
+
+        const [clsRes, trsRes] = await Promise.all([fetchClasses(), fetchTrainers()]);
+
+        const clsArr = normalizeToArray(clsRes);
+        const trsArr = normalizeToArray(trsRes);
+
+        if (!mounted) return;
+
+        // ambil 3 class untuk Home
+        const mappedClasses = clsArr.slice(0, 3).map((c) => ({
+          id: c.id,
+          name: c.name,
+          description: c.short_description || c.description || "",
+          image: c.image_url || c.image || "/images/class-fallback.jpg",
+        }));
+
+        // response trainer kamu:
+        // {
+        //   id,name,role, profile: { specialization, photo_url, social:{...} }
+        // }
+        const mappedTrainers = trsArr
+          .filter((t) => (t?.role ?? "") === "trainer") // optional, aman
+          .filter((t) => !!t?.profile) // biar yang profile null (Default Trainer) gak bikin card kosong
+          .slice(0, 6)
+          .map((t) => ({
+            id: t.id,
+            name: t.name,
+            role: t.profile?.specialization || "Trainer",
+            image: t.profile?.photo_url || "/images/trainer-fallback.jpg",
+            socials: {
+              facebook: t.profile?.social?.facebook || "#",
+              instagram: t.profile?.social?.instagram || "#",
+              x: t.profile?.social?.x || "#",
+              linkedin: t.profile?.social?.linkedin || "#",
+            },
+          }));
+
+        setClasses(mappedClasses);
+        setTrainers(mappedTrainers);
+      } catch (e) {
+        console.error(e);
+        setErr(e?.response?.data?.error || e?.message || "Gagal mengambil data dari server.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    run();
+    return () => {
+      mounted = false;
+    };
   }, []);
-
-  if (isLoading) return <LoadingSpinner />;
-  if (error) return <ErrorMessage message={error} onRetry={() => window.location.reload()} />;
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 },
-    },
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, scale: 0.9, y: 20 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      transition: { duration: 0.5 },
-    },
-  };
 
   return (
     <>
-      {/* SECTION: HOME (HERO) */}
+      {/* HERO */}
       <div id="home">
         <Hero />
       </div>
 
-      {/* SECTION: ABOUT */}
-      <motion.div
-        id="about"
-        className="about-section"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        viewport={{ once: true }}
-      >
-        <div className="about-container">
-          
-          {/* Header */}
+      {/* ===== SECTION 2 (Slider + Green wave) ===== */}
+      <section className="bg-zinc-900/95">
+        <div className="mx-auto max-w-6xl px-4 pt-14 pb-16">
           <motion.div
-            className="about-header"
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-          >
-            <motion.h2 className="about-title" variants={itemVariants}>
-              ABOUT <motion.span
-                className="about-title-accent"
-                animate={{ color: ['#39ff14', '#2ed612', '#39ff14'] }}
-                transition={{ repeat: Infinity, duration: 3 }}
-              >
-                HexaFit
-              </motion.span>
-            </motion.h2>
-            <motion.p className="about-subtitle" variants={itemVariants}>
-              Transforming lives through fitness since 2020.
-              <br/> 
-              More than just a gym, we're a community.
-            </motion.p>
-          </motion.div>
-
-          {/* Our Story */}
-          <motion.div
-            className="about-content"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
+            viewport={{ once: true, amount: 0.25 }}
+            className="space-y-10"
           >
             <motion.div variants={itemVariants}>
-              <motion.h3 className="about-story-title" variants={itemVariants}>
-                OUR <span className="about-story-title-accent">STORY</span>
-              </motion.h3>
-              <motion.p className="about-story-text" variants={itemVariants}>
-                HexaFit dimulai dari mimpi sederhana: menciptakan ruang di mana setiap orang, 
-                dari pemula hingga atlet profesional, dapat mencapai potensi penuh mereka.
-              </motion.p>
-              <motion.p className="about-story-text" variants={itemVariants}>
-                Dengan peralatan modern, trainer bersertifikat internasional, dan komunitas 
-                yang suportif, kami telah membantu ribuan member mencapai transformasi fisik 
-                dan mental mereka.
-              </motion.p>
-              <motion.p className="about-story-text" variants={itemVariants}>
-                Bagi kami, fitness bukan hanya tentang angka di timbangan atau otot di cermin. 
-                Ini tentang membangun kepercayaan diri, disiplin, dan gaya hidup sehat yang berkelanjutan.
-              </motion.p>
-            </motion.div>
-            
-            {/* Icon Placeholder */}
-            <motion.div
-              className="about-icon-container"
-              variants={itemVariants}
-              whileHover={{ scale: 1.05 }}
-            >
-              <motion.div
-                className="about-icon-box"
-                animate={{ y: [0, -10, 0] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-              >
-                <img 
-                    src="/images/1.png" 
-                    alt="HexaFit Logo" 
-                    className="w-full h-full object-contain"
-                  />
-              </motion.div>
+              <AutoSlider images={sliderImages} />
             </motion.div>
           </motion.div>
-
-            {/* SECTION: OUR TRAINERS */}
-            <motion.div
-              id="trainers"
-              className="trainers-section"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-            >
-              <div className="trainers-container">
-                <motion.div
-                  className="classes-header"
-                  variants={containerVariants}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.3 }}
-                >
-                  <div>
-                    <motion.h2 className="classes-title" variants={itemVariants}>
-                      Meet Our <motion.span
-                        className="classes-title-accent"
-                        animate={{ color: ['#39ff14', '#2ed612', '#39ff14'] }}
-                        transition={{ repeat: Infinity, duration: 3 }}
-                      >
-                        Trainers
-                      </motion.span>
-                    </motion.h2>
-                    <motion.p className="classes-subtitle" variants={itemVariants}>
-                      Pilih trainer terbaik dan kenali tim kami.
-                    </motion.p>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  className="classes-grid"
-                  variants={containerVariants}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.2 }}
-                >
-                  {
-                    [
-                      { id: 1, name: 'Alex Carter', role: 'Strength & Conditioning Coach', image: '/images/1.png' },
-                      { id: 2, name: 'Emily Turner', role: 'Yoga & Recovery Specialist', image: '/images/2.png' },
-                      { id: 3, name: 'Ethan Parker', role: 'Cardio & Endurance Coach', image: '/images/gym.jpg' },
-                      { id: 4, name: 'Oliver Reed', role: 'Performance Trainer', image: '/images/gym 2.jpg' },
-                      { id: 5, name: 'Ryan Brooks', role: 'Muscle Building Trainer', image: '/images/1.png' },
-                      { id: 6, name: 'Lucas Bennett', role: 'Mobility & Rehab Coach', image: '/images/2.png' }
-                    ].map(trainer => (
-                      <motion.div key={trainer.id} variants={cardVariants}>
-                        <TrainerCard trainer={trainer} />
-                      </motion.div>
-                    ))
-                  }
-                </motion.div>
-
-                <motion.div
-                  className="trainers-footer text-center mt-6"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ delay: 0.3, duration: 0.5 }}
-                  viewport={{ once: true }}
-                >
-                  <motion.button
-                    className="trainers-cta"
-                    whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(57, 255, 20, 0.5)' }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    See More Trainers
-                  </motion.button>
-                </motion.div>
-              </div>
-            </motion.div>
-
         </div>
-      </motion.div>
 
-      {/* SECTION: CLASSES */}
-      <motion.div
-        id="classes"
-        className="classes-section"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        viewport={{ once: true }}
-      >
+        {/* GREEN WAVE FULL WIDTH */}
         <motion.div
-          className="classes-header"
-          variants={containerVariants}
+          variants={itemVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ once: true, amount: 0.25 }}
+          className="
+            relative w-screen
+            left-1/2 -translate-x-1/2
+            overflow-hidden
+            bg-[#53B602]
+            py-12 md:py-16
+          "
         >
-          <div>
-            <motion.h2 className="classes-title" variants={itemVariants}>
-              Kelas <motion.span
-                className="classes-title-accent"
-                animate={{ color: ['#39ff14', '#2ed612', '#39ff14'] }}
-                transition={{ repeat: Infinity, duration: 3 }}
-              >
-                Tersedia
-              </motion.span>
-            </motion.h2>
-            <motion.p className="classes-subtitle" variants={itemVariants}>
-              Pilih kelas dan mulai latihanmu.
-            </motion.p>
+          <div className="pointer-events-none absolute inset-x-0 -top-10 h-20 bg-zinc-900/95 rounded-b-[60%]" />
+          <div className="pointer-events-none absolute inset-x-0 -bottom-10 h-20 bg-zinc-900/95 rounded-t-[60%]" />
+
+          <div className="relative mx-auto max-w-6xl px-4">
+            <h2 className="text-center text-3xl md:text-5xl font-extrabold tracking-tight text-black">
+              YOUR BODY IS YOUR GREATEST ASSET
+            </h2>
+
+            <p className="mt-4 text-center text-black/80 text-sm md:text-lg max-w-3xl mx-auto">
+              Train with purpose through structured programs designed to build strength, endurance, and confidence.
+            </p>
+
+            <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+              <div className="space-y-4">
+                {["Strength-Focused Training", "Expert-Guided Workouts", "Visible Results"].map((t) => (
+                  <div key={t} className="flex items-center gap-4">
+                    <span className="w-9 h-9 rounded-full bg-black/10 flex items-center justify-center">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                    </span>
+                    <span className="text-black font-bold text-lg">{t}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="md:col-span-2 flex flex-wrap gap-5 md:justify-end">
+                <button
+                  onClick={() => document.getElementById("classes")?.scrollIntoView({ behavior: "smooth" })}
+                  className="px-8 py-4 rounded-xl bg-black text-white font-semibold hover:opacity-90 transition"
+                >
+                  Explore Our Programs
+                </button>
+
+                <button
+                  onClick={() => navigate("/pricing")}
+                  className="px-8 py-4 rounded-xl bg-black/10 text-black font-semibold hover:bg-black/20 transition"
+                >
+                  See Pricing
+                </button>
+
+                <button
+                  onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+                  className="px-8 py-4 rounded-xl bg-black/10 text-black font-semibold hover:bg-black/20 transition"
+                >
+                  Contact Us
+                </button>
+              </div>
+            </div>
           </div>
         </motion.div>
-        
-        {classes.length > 0 ? (
+      </section>
+
+      {/* ===== OUR CLASSES ===== */}
+      <section id="classes" className="bg-zinc-900/95">
+        <div className="mx-auto max-w-6xl px-4 py-16">
           <motion.div
-            className="classes-grid"
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
+            viewport={{ once: true, amount: 0.25 }}
           >
-            {classes.map((cls) => (
-              <motion.div key={cls.id} variants={cardVariants}>
-                <ClassCard cls={cls} />
-              </motion.div>
-            ))}
-          </motion.div>
-        ) : (
-          <motion.div
-            className="classes-empty"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-          >
-            <p>Belum ada kelas yang tersedia saat ini.</p>
-          </motion.div>
-        )}
-      </motion.div>
+            <motion.div variants={itemVariants} className="flex items-start justify-between gap-6">
+              <div>
+                <p className="text-white/70 text-sm font-semibold tracking-widest">OUR CLASSES</p>
+                <h2 className="mt-3 text-3xl md:text-4xl font-extrabold">
+                  <span className="text-[#53B602]">Programs</span>{" "}
+                  <span className="text-white">That Match Your</span>
+                  <br />
+                  <span className="text-white">Fitness Goals</span>
+                </h2>
+              </div>
 
-      {/* SECTION: CONTACT */}
-      <motion.div
-        id="contact"
-        className="contact-section"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        viewport={{ once: true }}
-      >
-        <div className="contact-container">
-          
-          {/* Header */}
-          <motion.div
-            className="contact-header"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-          >
-            <motion.h2 className="contact-title" variants={itemVariants}>
-              GET IN <motion.span
-                className="contact-title-accent"
-                animate={{ textShadow: ['0 0 10px rgba(57, 255, 20, 0.3)', '0 0 20px rgba(57, 255, 20, 0.6)', '0 0 10px rgba(57, 255, 20, 0.3)'] }}
-                transition={{ repeat: Infinity, duration: 2.5 }}
+              <button
+                onClick={() => navigate("/classes")}
+                className="
+                  px-6 py-3 rounded-lg
+                  border border-[#53B602]
+                  text-white font-semibold
+                  hover:bg-[#53B602] hover:text-black
+                  transition
+                  hidden md:inline-flex
+                "
               >
-                TOUCH
-              </motion.span>
-            </motion.h2>
-            <motion.p className="contact-subtitle" variants={itemVariants}>
-              Ada pertanyaan? Ingin bergabung? Tim kami siap membantu Anda!
-            </motion.p>
-          </motion.div>
-
-          {/* Contact Cards */}
-          <motion.div
-            className="contact-grid"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-          >
-            
-            {/* Location Card */}
-            <motion.div className="contact-card" variants={cardVariants} whileHover={{ y: -5 }}>
-              <motion.div
-                className="contact-card-icon"
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-              >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-              </motion.div>
-              <h3 className="contact-card-title">Location</h3>
-              <p className="contact-card-text">
-                Jl. Fitness Boulevard No. 88<br/>
-                Jakarta Selatan 12345<br/>
-                Indonesia
-              </p>
+                More Classes
+              </button>
             </motion.div>
 
-            {/* Phone Card */}
-            <motion.div className="contact-card" variants={cardVariants} whileHover={{ y: -5 }}>
-              <motion.div
-                className="contact-card-icon"
-                animate={{ rotate: [0, 10, 0] }}
-                transition={{ repeat: Infinity, duration: 2 }}
+            {err && (
+              <motion.p variants={itemVariants} className="mt-8 text-red-400">
+                {err}
+              </motion.p>
+            )}
+
+            <motion.div variants={containerVariants} className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-10 items-start">
+              {(loading ? Array.from({ length: 3 }) : classes).map((cls, idx) => (
+                <motion.div key={cls?.id || idx} variants={cardVariants} className="flex justify-center">
+                  {loading ? (
+                    <div className="w-[320px] h-[260px] rounded-2xl bg-white/5 animate-pulse" />
+                  ) : (
+                    <ClassCard cls={cls} />
+                  )}
+                </motion.div>
+              ))}
+            </motion.div>
+
+            <div className="mt-10 md:hidden flex justify-center">
+              <button
+                onClick={() => navigate("/classes")}
+                className="px-6 py-3 rounded-lg border border-[#53B602] text-white font-semibold hover:bg-[#53B602] hover:text-black transition"
               >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                </svg>
-              </motion.div>
-              <h3 className="contact-card-title">Phone</h3>
-              <p className="contact-card-text">+62 812-3456-7890</p>
-              <p className="contact-card-hours">Mon - Sun: 06:00 - 22:00</p>
-            </motion.div>
-
-            {/* Email Card */}
-            <motion.div className="contact-card" variants={cardVariants} whileHover={{ y: -5 }}>
-              <motion.div
-                className="contact-card-icon"
-                animate={{ x: [0, -3, 0] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-              >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                </svg>
-              </motion.div>
-              <h3 className="contact-card-title">Email</h3>
-              <p className="contact-card-text">info@hexafit.com</p>
-              <p className="contact-card-text">support@hexafit.com</p>
-            </motion.div>
-
+                More Classes
+              </button>
+            </div>
           </motion.div>
-
-          {/* Social Media */}
-          <motion.div
-            className="contact-social"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            viewport={{ once: true }}
-          >
-            <h3 className="contact-social-title">Follow Us</h3>
-            <motion.div
-              className="contact-social-links"
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              <motion.a href="#" className="contact-social-link" variants={itemVariants} whileHover={{ scale: 1.2, rotate: 10 }} whileTap={{ scale: 0.9 }}>
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                </svg>
-              </motion.a>
-              <motion.a href="#" className="contact-social-link" variants={itemVariants} whileHover={{ scale: 1.2, rotate: 10 }} whileTap={{ scale: 0.9 }}>
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-              </motion.a>
-              <motion.a href="#" className="contact-social-link" variants={itemVariants} whileHover={{ scale: 1.2, rotate: 10 }} whileTap={{ scale: 0.9 }}>
-                <svg fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417a9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                </svg>
-              </motion.a>
-            </motion.div>
-          </motion.div>
-
         </div>
-      </motion.div>
+      </section>
+
+      {/* ===== MEET OUR TRAINERS ===== */}
+      <section id="trainers" className="bg-zinc-900/95">
+        <div className="mx-auto max-w-6xl px-4 py-16">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            <motion.div variants={itemVariants} className="text-center">
+              <p className="text-white/70 text-sm font-semibold tracking-widest">OUR TRAINERS</p>
+              <h2 className="mt-3 text-3xl md:text-4xl font-extrabold">
+                <span className="text-white">Meet Our</span>{" "}
+                <span className="text-[#53B602]">Trainers</span>
+              </h2>
+              <p className="mt-3 text-white/70 text-sm">Pilih trainer terbaik dan kenali tim kami.</p>
+            </motion.div>
+
+            <motion.div
+              variants={containerVariants}
+              className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 place-items-center"
+            >
+              {(loading ? Array.from({ length: 6 }) : trainers).map((trainer, idx) => (
+                <motion.div key={trainer?.id || idx} variants={cardVariants}>
+                  {loading ? (
+                    <div className="w-[260px] h-[360px] rounded-2xl bg-white/5 animate-pulse" />
+                  ) : (
+                    <TrainerCard trainer={trainer} />
+                  )}
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
     </>
   );
 };
