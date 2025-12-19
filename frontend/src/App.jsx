@@ -12,6 +12,7 @@ import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import PricingPage from "./pages/pricing/Pages";
+import AboutUs from "./pages/about/AboutUs";
 
 // Dashboards
 import MemberDashboard from "./pages/Dashboard/MemberDashboard";
@@ -39,6 +40,7 @@ function App() {
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/about" element={<AboutUs />} />
 
             {/* DASHBOARD REDIRECT */}
             <Route

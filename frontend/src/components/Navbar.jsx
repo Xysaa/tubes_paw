@@ -69,7 +69,7 @@ const Navbar = () => {
                   <button onClick={() => goHomeAndScroll("home")} className={pillBtn}>Home</button>
                   <button onClick={() => goHomeAndScroll("trainers")} className={pillBtn}>Trainers</button>
                   <Link to="/pricing" className={pillBtn}>Pricing</Link>
-                  <button onClick={() => goHomeAndScroll("about")} className={pillBtn}>About</button>
+                  <Link to="/About" className={pillBtn}>about</Link>
                 </>
               )}
 
