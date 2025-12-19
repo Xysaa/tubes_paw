@@ -91,8 +91,11 @@ Platform booking kelas gym terintegrasi yang memungkinkan Member untuk mendaftar
 ---
 
 ## 📸 Screenshots
-![Dashboard Member](link_gambar_dashboard)
-![Manajemen Kelas](link_gambar_kelas)
+
+![Dashboard Member](https://drive.google.com/file/d/1B0F_e-OtCdbbhS5UV7DMlgPd-X1N8krS/view?usp=drive_link)
+![Dashboard Trainer](https://drive.google.com/file/d/1ABklETVJLFeh7TZP-DDxX3puhRE4KqoQ/view?usp=drive_link)
+![Dashboard Admin 1](https://drive.google.com/file/d/1kAyRyjbFacr3Bo_jWG-Alv6tlIQR3MBk/view?usp=drive_link)
+![Dashboard Admin 2](https://drive.google.com/file/d/1zcc4-9k7TDDD5PpM-kVnlfvPQDh204Mt/view?usp=drive_link)
 
 ---
 
